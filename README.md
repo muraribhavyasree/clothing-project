@@ -2,7 +2,7 @@
 
 FitCraft is a modern, premium web application designed to solve the fashion industry's "fixed size" problem by enabling direct customer-to-tailor garment personalization through precise body measurements.
 
-This repository is organized as a high-performance **Turborepo monorepo** architecture.
+This repository is organized as a high-performance **NPM Workspaces monorepo** architecture.
 
 ---
 
@@ -18,7 +18,7 @@ This repository is organized as a high-performance **Turborepo monorepo** archit
 
 ## 🛠️ Architecture & Tech Stack
 
-The workspace is structured into standalone, reusable applications using **NPM Workspaces** and **Turborepo**:
+The workspace is structured into standalone, reusable applications using **NPM Workspaces**:
 
 ```
 clothing-project/
@@ -27,12 +27,11 @@ clothing-project/
 │   └── backend/      # Express.js API server
 ├── scripts/
 │   └── setup.js      # Interactive environment configurator
-├── package.json      # Workspace definitions
-└── turbo.json        # Pipeline execution instructions
+└── package.json      # Workspace definitions
 ```
 
 ### Stack Details
-- **Monorepo Engine**: [Turborepo](https://turbo.build/)
+- **Monorepo Engine**: NPM Workspaces
 - **Frontend**: React 19, Redux Toolkit, Vite, React Router
 - **Backend**: Node.js, Express.js, MongoDB (Mongoose), JSON Web Tokens (JWT)
 
@@ -58,8 +57,6 @@ npm run dev
 ```
 - **Frontend URL**: [http://localhost:5173](http://localhost:5173)
 - **Backend API URL**: [http://localhost:5001](http://localhost:5001)
-
-*(Note: If you run into environment-specific file locking issues due to Windows mapped drives, run `npm run dev:fallback` instead).*
 
 ---
 

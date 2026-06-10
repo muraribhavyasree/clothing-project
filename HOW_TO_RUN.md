@@ -1,6 +1,6 @@
 # FitCraft - Custom-Fit Clothing Platform
 
-This is a modern custom-fit clothing platform powered by Turborepo.
+This is a modern custom-fit clothing platform organized as a monorepo workspace.
 
 ## 🚀 How to Run the Project
 
@@ -35,7 +35,7 @@ npm install
 ```
 
 ### 4. Running the Application
-Launch both the frontend and backend in development mode using Turborepo:
+Launch both the frontend and backend in development mode concurrently:
 ```bash
 npm run dev
 ```

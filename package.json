@@ -5,16 +5,13 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "turbo run build",
-    "dev": "node scripts/setup.js && turbo run dev",
-    "lint": "turbo run lint",
-    "dev:fallback": "node scripts/setup.js && concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
-    "build:fallback": "npm run build --workspace=backend && npm run build --workspace=frontend",
+    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
+    "dev": "node scripts/setup.js && concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "lint": "npm run lint --workspace=frontend",
     "postinstall": "node scripts/setup.js"
   },
   "devDependencies": {
-    "concurrently": "^9.0.1",
-    "turbo": "latest"
+    "concurrently": "^9.0.1"
   },
   "packageManager": "npm@10.9.2"
 }

@@ -78,6 +78,28 @@ function logStatus(symbol, task, details = '') {
   console.log(`  ${symbol} ${task}${detailsStr}`);
 }
 
+function parseEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return {};
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const lines = content.split(/\r?\n/);
+    const config = {};
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = line.indexOf('=');
+      if (eqIdx !== -1) {
+        const key = line.slice(0, eqIdx).trim();
+        const value = line.slice(eqIdx + 1).trim();
+        config[key] = value;
+      }
+    }
+    return config;
+  } catch (error) {
+    return {};
+  }
+}
+
 function parseEnvExample(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const lines = content.split(/\r?\n/);
@@ -100,7 +122,52 @@ function parseEnvExample(filePath) {
   return vars;
 }
 
-async function configureEnvInteractive(appName, folderPath) {
+function getBackendPort(backendDir) {
+  const envPath = path.join(backendDir, '.env');
+  const config = parseEnvFile(envPath);
+  if (config.PORT) {
+    return config.PORT;
+  }
+  const examplePath = path.join(backendDir, '.env.example');
+  const exampleConfig = parseEnvFile(examplePath);
+  return exampleConfig.PORT || '5001';
+}
+
+function getFrontendPort(frontendDir, backendDir) {
+  // 1. Check backend's existing env for CLIENT_URL or FRONTEND_URL
+  const backendEnvPath = path.join(backendDir, '.env');
+  const backendConfig = parseEnvFile(backendEnvPath);
+  const backendUrlVal = backendConfig.CLIENT_URL || backendConfig.FRONTEND_URL;
+  if (backendUrlVal) {
+    try {
+      const url = new URL(backendUrlVal.trim());
+      if (url.port) return url.port;
+    } catch (e) {}
+  }
+
+  // 2. Check backend's .env.example
+  const backendExamplePath = path.join(backendDir, '.env.example');
+  const backendExampleConfig = parseEnvFile(backendExamplePath);
+  const backendExampleUrlVal = backendExampleConfig.CLIENT_URL || backendExampleConfig.FRONTEND_URL;
+  if (backendExampleUrlVal) {
+    try {
+      const url = new URL(backendExampleUrlVal.trim());
+      if (url.port) return url.port;
+    } catch (e) {}
+  }
+
+  // 3. Fallback default
+  return '5173';
+}
+
+function shouldUpdateLocalhostUrl(existingValue, targetValue) {
+  if (!existingValue || !targetValue) return false;
+  if (existingValue === targetValue) return false;
+  // Only update if existing value is localhost or 127.0.0.1
+  return existingValue.includes('localhost') || existingValue.includes('127.0.0.1');
+}
+
+async function configureEnvInteractive(appName, folderPath, otherFolderPath) {
   const examplePath = path.join(folderPath, '.env.example');
   const envPath = path.join(folderPath, '.env');
   
@@ -116,20 +183,96 @@ async function configureEnvInteractive(appName, folderPath) {
     return;
   }
 
+  // Load existing config keys if the .env file exists
+  let existingConfig = {};
   if (fs.existsSync(envPath)) {
+    existingConfig = parseEnvFile(envPath);
+  }
+
+  const isFrontend = appName.includes('Frontend');
+  const isBackend = appName.includes('Backend');
+
+  const parsed = parseEnvExample(examplePath);
+  const targetValues = {};
+  const autoConfigured = {};
+
+  for (const item of parsed) {
+    if (item.type !== 'var') continue;
+
+    const hasExisting = item.key in existingConfig;
+    const existingValue = existingConfig[item.key];
+
+    // Compute dynamic auto-configured value if applicable
+    let derivedValue = null;
+    if (isBackend && (item.key === 'CLIENT_URL' || item.key === 'FRONTEND_URL')) {
+      const frontendPort = getFrontendPort(otherFolderPath, folderPath);
+      derivedValue = `http://localhost:${frontendPort}`;
+    } else if (isFrontend && item.key === 'VITE_API_URL') {
+      const backendPort = getBackendPort(otherFolderPath);
+      derivedValue = `http://localhost:${backendPort}/api`;
+    } else if (isFrontend && item.key === 'VITE_BASE_URL') {
+      const backendPort = getBackendPort(otherFolderPath);
+      derivedValue = `http://localhost:${backendPort}`;
+    }
+
+    if (derivedValue !== null) {
+      if (hasExisting) {
+        if (shouldUpdateLocalhostUrl(existingValue, derivedValue)) {
+          targetValues[item.key] = derivedValue;
+          autoConfigured[item.key] = true;
+        } else {
+          // Preserve custom URL configurations
+          targetValues[item.key] = existingValue;
+        }
+      } else {
+        targetValues[item.key] = derivedValue;
+        autoConfigured[item.key] = true;
+      }
+    } else if (hasExisting) {
+      // Preserve other existing values
+      targetValues[item.key] = existingValue;
+    }
+  }
+
+  // Find promptable variables that are missing from targetValues
+  const missingPromptableVars = parsed.filter(item => item.type === 'var' && !(item.key in targetValues));
+
+  // Determine if we need to write the file
+  let needsWrite = false;
+  if (!fs.existsSync(envPath)) {
+    needsWrite = true;
+  } else {
+    for (const item of parsed) {
+      if (item.type === 'var') {
+        if (existingConfig[item.key] !== targetValues[item.key]) {
+          needsWrite = true;
+          break;
+        }
+      }
+    }
+  }
+
+  // If the .env file exists and everything matches perfectly, skip.
+  if (!needsWrite) {
     logStatus(
       symbols.info,
       `${colors.bold}${appName}${colors.reset} environment file is already configured.`,
-      `${relativeEnv} exists`
+      `${relativeEnv} exists & matches template`
     );
     return;
   }
 
-  console.log(`\n${colors.bold}${colors.brightCyan}Configure environment for ${appName}:${colors.reset}`);
-  console.log(`${colors.dim}Press Enter to accept the default value shown in brackets.${colors.reset}\n`);
+  // Display start of prompts / updates
+  if (fs.existsSync(envPath) && missingPromptableVars.length > 0) {
+    console.log(`\n${colors.bold}${colors.yellow}${symbols.warning} Detected missing variable(s) in ${relativeEnv}:${colors.reset}`);
+    console.log(`${colors.dim}Prompting only for the missing values:${colors.reset}\n`);
+  } else if (!fs.existsSync(envPath)) {
+    console.log(`\n${colors.bold}${colors.brightCyan}Configure environment for ${appName}:${colors.reset}`);
+    console.log(`${colors.dim}Press Enter to accept the default value shown in brackets.${colors.reset}\n`);
+  }
 
-  const parsed = parseEnvExample(examplePath);
   const envLines = [];
+  const envFileExistsBefore = fs.existsSync(envPath);
 
   for (const item of parsed) {
     if (item.type !== 'var') {
@@ -137,17 +280,28 @@ async function configureEnvInteractive(appName, folderPath) {
       continue;
     }
 
-    const query = `  ${colors.brightBlue}?${colors.reset} ${colors.bold}${item.key}${colors.reset} ${colors.dim}[${item.defaultValue}]${colors.reset}: `;
-    const answer = await askQuestion(query);
-    const value = answer !== '' ? answer : item.defaultValue;
+    let value;
+    if (item.key in targetValues) {
+      value = targetValues[item.key];
+      if (autoConfigured[item.key]) {
+        logStatus(symbols.info, `${colors.bold}${item.key}${colors.reset} auto-configured to ${colors.green}${value}${colors.reset}`);
+      }
+    } else {
+      const defaultVal = item.defaultValue;
+      const query = `  ${colors.brightBlue}?${colors.reset} ${colors.bold}${item.key}${colors.reset} ${colors.dim}[${defaultVal}]${colors.reset}: `;
+      const answer = await askQuestion(query);
+      value = answer !== '' ? answer : defaultVal;
+      targetValues[item.key] = value;
+    }
     envLines.push(`${item.key}=${value}`);
   }
 
   try {
     fs.writeFileSync(envPath, envLines.join('\n'));
+    const actionWord = envFileExistsBefore ? 'updated' : 'created';
     logStatus(
       symbols.success,
-      `Successfully created ${colors.bold}${relativeEnv}`,
+      `Successfully ${actionWord} ${colors.bold}${relativeEnv}`,
       `configured with custom/default values`
     );
   } catch (error) {
@@ -170,9 +324,9 @@ async function main() {
   const frontendDir = path.join(rootDir, 'apps', 'frontend');
   const backendDir = path.join(rootDir, 'apps', 'backend');
 
-  // Prompts only if .env is missing. If already present, skips prompting for that app.
-  await configureEnvInteractive('Frontend (Client)', frontendDir);
-  await configureEnvInteractive('Backend (Server)', backendDir);
+  // Prompts Backend first, then Frontend (allowing frontend to auto-detect configured backend port)
+  await configureEnvInteractive('Backend (Server)', backendDir, frontendDir);
+  await configureEnvInteractive('Frontend (Client)', frontendDir, backendDir);
 
   heading('2. Workspace Development Verification');
   
@@ -184,8 +338,7 @@ async function main() {
   console.log(`${colors.brightGreen}================================================================${colors.reset}\n`);
   
   console.log(`${colors.bold}To start the local development servers:${colors.reset}`);
-  console.log(`  ${symbols.arrow} ${colors.brightCyan}npm run dev${colors.reset} (runs turborepo dev servers)`);
-  console.log(`  ${symbols.arrow} ${colors.brightCyan}npm run dev:fallback${colors.reset} (fallback concurrently mode if required)\n`);
+  console.log(`  ${symbols.arrow} ${colors.brightCyan}npm run dev${colors.reset} (starts local dev servers)\n`);
 }
 
 main();
