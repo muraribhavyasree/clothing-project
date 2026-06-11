@@ -1,57 +1,32 @@
 # 🧵 FitCraft — Custom-Fit Clothing Platform
 
-FitCraft is a modern, premium web application designed to solve the fashion industry's "fixed size" problem by enabling direct customer-to-tailor garment personalization through precise body measurements.
-
-This repository is organized as a high-performance **NPM Workspaces monorepo** architecture.
+FitCraft is a modern, premium web application designed to solve the fashion industry's "fixed size" problem by enabling direct customer-to-tailor garment personalization through body measurements.
 
 ---
 
-## ✨ Features
+## 📖 Project Wiki & Documentation
 
-- **Custom-Tailored Fit**: Enter individual body measurements to ensure a perfect garment fit.
-- **Product Customization**: Select fabrics, colors, styles, and fits dynamically.
-- **Interactive Dashboards**: Tailored dashboards for customers, vendors, and platform administrators.
-- **Order Tracking & Feedback**: Track your custom garment from selection to tailoring to delivery.
-- **Automated CLI Setup**: Interactive CLI automatically configures local environment variables.
+We have moved all project details, architecture outlines, features, and deployment configurations to our **[FitCraft Project Wiki](../../wiki)**.
 
----
-
-## 🛠️ Architecture & Tech Stack
-
-The workspace is structured into standalone, reusable applications using **NPM Workspaces**:
-
-```
-clothing-project/
-├── apps/
-│   ├── frontend/     # React (Vite) client application
-│   └── backend/      # Express.js API server
-├── scripts/
-│   └── setup.js      # Interactive environment configurator
-└── package.json      # Workspace definitions
-```
-
-### Stack Details
-- **Monorepo Engine**: NPM Workspaces
-- **Frontend**: React 19, Redux Toolkit, Vite, React Router
-- **Backend**: Node.js, Express.js, MongoDB (Mongoose), JSON Web Tokens (JWT)
+For a comprehensive understanding of the platform, database schemas, feature roadmap, and development updates, please visit:
+👉 **[Go to the Project Wiki](../../wiki)**
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Prerequisites
-- **Node.js**: v18.0.0 or higher
-- **NPM**: v10.0.0 or higher
+To run the project locally, run a single install command:
 
-### 2. Setup & Installation
-Clone the repository and run `npm install` at the root folder:
+### 1. Installation & Auto-Setup
+Run the following command at the root of the project:
 ```bash
 npm install
 ```
-During the installation, a **custom interactive setup CLI** will run. It will guide you through setting up environment variables (`.env`) for both the frontend and backend. You can accept default values by simply pressing **Enter**.
+> [!NOTE]
+> Running `npm install` automatically triggers our **interactive environment setup utility** under the hood. It will configure the environment variables (`.env`) for both the frontend and backend with default/custom values automatically.
 
-### 3. Run the Application
-Start both the API server and the frontend client concurrently:
+### 2. Run the Application
+Start the frontend and backend servers concurrently:
 ```bash
 npm run dev
 ```
@@ -60,7 +35,7 @@ npm run dev
 
 ---
 
-## 📖 Documentation
+## 🛠️ Project Structure
 
-- **Development Guide**: See [HOW_TO_RUN.md](file:///r:/programs/training/clothing-project/HOW_TO_RUN.md) for detailed configuration, local running steps, and parameters.
-- **Deployment Guide**: See [DEPLOYMENT.md](file:///r:/programs/training/clothing-project/DEPLOYMENT.md) for hosting the apps on Vercel and Render.
+- `apps/frontend`: React (Vite) client application
+- `apps/backend`: Express.js API server
