@@ -69,8 +69,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/tailors', tailorsRoutes);
 app.use('/api/custom-orders', customOrderRoutes);
 
-
-
 //  404 Handler 
 app.use('/api/*', (req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
