@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://clothing-project-4dh0.onrender.com/api/$1"
+    }
+  ]
+}
