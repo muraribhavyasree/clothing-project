@@ -35,7 +35,6 @@ Vercel is the preferred choice for the React frontend.
 5. **Output Directory**: `dist`
 6. **Environment Variables**:
    - `VITE_API_URL`: Your Render API URL (e.g., `https://your-api.onrender.com/api`).
-   - `VITE_BASE_URL`: Your Render API Base URL (e.g., `https://your-api.onrender.com`).
 
 ---
 

@@ -121,8 +121,7 @@ function patchFrontendEnv(backendUrl) {
   try {
     let content = fs.readFileSync(envPath, 'utf-8');
     content = content
-      .replace(/^VITE_API_URL=.*/m,  `VITE_API_URL=${backendUrl}/api`)
-      .replace(/^VITE_BASE_URL=.*/m, `VITE_BASE_URL=${backendUrl}`);
+      .replace(/^VITE_API_URL=.*/m,  `VITE_API_URL=${backendUrl}/api`);
     fs.writeFileSync(envPath, content, 'utf-8');
     console.log('[ngrok] ✅  Updated frontend .env with live ngrok backend URL.');
   } catch (e) {

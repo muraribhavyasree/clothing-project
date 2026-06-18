@@ -14,7 +14,7 @@ const OpenOrders = () => {
 
   // Socket.io Real-time connection setup
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_BASE_URL || 'http://localhost:5001', {
+    const socket = io(window.location.origin, {
       transports: ['websocket', 'polling']
     });
 

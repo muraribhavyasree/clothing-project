@@ -210,9 +210,6 @@ async function configureEnvInteractive(appName, folderPath, otherFolderPath) {
     } else if (isFrontend && item.key === 'VITE_API_URL') {
       const backendPort = getBackendPort(otherFolderPath);
       derivedValue = `http://localhost:${backendPort}/api`;
-    } else if (isFrontend && item.key === 'VITE_BASE_URL') {
-      const backendPort = getBackendPort(otherFolderPath);
-      derivedValue = `http://localhost:${backendPort}`;
     }
 
     if (derivedValue !== null) {

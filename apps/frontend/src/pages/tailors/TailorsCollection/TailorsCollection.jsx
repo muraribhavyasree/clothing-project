@@ -37,7 +37,7 @@ const TailorsCollection = () => {
                 <Link to={`/tailors/products/detail/${product._id}`} className="vc-card__image-wrap">
                   {product.primaryImage ? (
                     <img 
-                      src={`${import.meta.env.VITE_BASE_URL || 'http://localhost:5001'}${product.primaryImage}`} 
+                      src={`${window.location.origin}${product.primaryImage}`} 
                       alt={product.name}
                       className="vc-card__image" 
                     />

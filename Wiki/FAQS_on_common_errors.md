@@ -73,8 +73,8 @@ A deep dive into 20 real-world scenarios you might encounter while developing fo
 
 - **Problem:** 404 error on image URL.
 - **Symptoms:** Product images appear as broken icons in the browser.
-- **Root Cause:** `VITE_BASE_URL` mismatch or Express static route not defined.
-- **Solution:** Ensure `app.use('/uploads', express.static(...))` is in `server.js`.
+- **Root Cause:** Asset URL mismatch or Express static route not defined.
+- **Solution:** Ensure `app.use('/uploads', express.static(...))` is in `server.js` and use relative upload paths from the frontend.
 - **Prevention:** Verify static asset middleware and frontend URL prefixes during environment setup.
 
 ---

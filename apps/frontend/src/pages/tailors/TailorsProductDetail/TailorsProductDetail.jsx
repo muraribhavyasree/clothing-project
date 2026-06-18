@@ -51,7 +51,7 @@ const TailorsProductDetail = () => {
       <div className="tailors-detail-grid">
         <div className="tailors-detail-image-box">
           {product.primaryImage ? (
-            <img src={`${import.meta.env.VITE_BASE_URL}${product.primaryImage}`} alt={product.name} className="tailors-detail-image" />
+            <img src={product.primaryImage} alt={product.name} className="tailors-detail-image" />
           ) : (
             <Shirt size={80} color="var(--color-border)" />
           )}

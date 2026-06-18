@@ -25,7 +25,6 @@ MONGO_URI=mongodb+srv://... or mongodb://localhost:27017/fitcraft
 A `.env` file should exist in `apps/frontend/` with the following variables:
 ```env
 VITE_API_URL=http://localhost:5001/api
-VITE_BASE_URL=http://localhost:5001
 ```
 
 ### 3. Installation
