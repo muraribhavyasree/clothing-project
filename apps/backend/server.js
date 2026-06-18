@@ -69,6 +69,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/tailors', tailorsRoutes);
 app.use('/api/custom-orders', customOrderRoutes);
 
+
+
 //  404 Handler 
 app.use('/api/*', (req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
@@ -88,8 +90,6 @@ const io = new Server(server, {
   cors: {
     origin: [
       process.env.CLIENT_URL,
-      "https://clothing-project-frontend-lz4swx4fd-bhavya14.vercel.app",
-      "https://clothing-project-frontend-git-main-bhavya14.vercel.app",
       "https://clothing-project-frontend.vercel.app",
       "http://localhost:5173"
     ],
