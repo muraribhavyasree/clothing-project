@@ -92,13 +92,18 @@ const { Server } = require('socket.io');
 
 const PORT = process.env.PORT || 5001;
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    methods: ["GET", "POST", "PUT"]
+    origin: [
+      process.env.CLIENT_URL,
+      "https://clothing-project-frontend.vercel.app",
+      "http://localhost:5173"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
   }
 });
-
 // Attach socket.io server instance to app settings so controllers can access it
 app.set('io', io);
 
