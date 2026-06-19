@@ -8,16 +8,12 @@ const StarRating = ({ rating }) => (
     ))}
   </div>
 );
-const API_URL = import.meta.env.VITE_API_URL;
+
 const ProductCard = ({ product }) => (
   <Link to={`/products/${product._id}`} className="product-card-full">
     <div className="product-card-full__image" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {product.primaryImage ? (
-        <img
-  src={`${API_URL}${product.primaryImage}`}
-  alt={product.name}
-  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-/>
+        <img src={product.primaryImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
         <Shirt size={64} color="var(--color-gold-muted)" />
       )}
