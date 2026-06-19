@@ -13,10 +13,7 @@ const ProductCard = ({ product }) => (
   <Link to={`/products/${product._id}`} className="product-card-full">
     <div className="product-card-full__image" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {product.primaryImage ? (
-        <img
-  src={`${import.meta.env.VITE_API_URL}${product.primaryImage}`}
-  alt={product.name}
-/>
+        <img src={product.primaryImage} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
         <Shirt size={64} color="var(--color-gold-muted)" />
       )}
@@ -45,6 +42,5 @@ const ProductCard = ({ product }) => (
     </div>
   </Link>
 );
-console.log(product.primaryImage);
-console.log(import.meta.env.VITE_API_URL);
+
 export default ProductCard;
