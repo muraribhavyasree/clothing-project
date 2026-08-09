@@ -13,12 +13,11 @@ const ImageGallery = ({ product, color }) => {
         onMouseLeave={() => setImageZoomed(false)}
       >
         {product.images && product.images.length > 0 ? (
-         <img
-  src={img.startsWith("http") ? img : `${BACKEND_URL}${img}`}
-  alt=""
+          <img
+  src={`${BACKEND_URL}${product.images[currentImageIndex]}`}
+  alt={product.name}
   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 />
-
         ) : (
           <div className="customize-image-placeholder">
             <Shirt size={80} color="var(--color-gold-muted)" />
